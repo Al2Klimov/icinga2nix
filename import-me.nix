@@ -7,9 +7,10 @@
     group = "icinga2";
   };
 
-  systemd.services.icinga2 = {
+  systemd.services.icinga2 = with pkgs; {
     serviceConfig = {
-      ExecStart = "+${pkgs.icinga2}/bin/icinga2 daemon --close-stdio -c ${./icinga2.conf}";
+      ExecStartPre = "+${bash}/bin/bash ${./icinga2.bash}";
+      ExecStart = "+${icinga2}/bin/icinga2 daemon --close-stdio -c ${./icinga2.conf}";
       Type = "notify";
       NotifyAccess = "all";
       KillMode = "mixed";
@@ -23,5 +24,11 @@
       User = "icinga2";
     };
     wantedBy = [ "multi-user.target" ];
+    path = [ coreutils icinga2 ];
+  };
+
+  services.redis.servers.icingadb = {
+    enable = true;
+    port = 6380;
   };
 }
