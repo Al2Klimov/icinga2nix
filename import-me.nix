@@ -60,13 +60,21 @@ in {
     wantedBy = [ "multi-user.target" ];
   };
 
-  services.mysql = {
+  services.mysql = with pkgs; {
     enable = true;
-    package = pkgs.mariadb;
+    package = mariadb;
     initialDatabases = [
       {
         name = "icingadb";
         schema = "${icingadbSrc}/schema/mysql/schema.sql";
+      }
+      {
+        name = "icingaweb2";
+        schema = writeText "schema" ''
+${builtins.readFile "${icingaweb2.src}/schema/mysql.schema.sql"}
+
+INSERT INTO icingaweb_user VALUES ('icingaadmin', 1, '$2y$10$38ttWP3MFfQ2c5GtPEdBFuJbmgb9y5Jp9HGxeTYhYDE.5irEFpIfK', NOW(), NOW());
+'';
       }
     ];
     ensureUsers = [
@@ -74,6 +82,35 @@ in {
         name = "icingadb";
         ensurePermissions."icingadb.*" = "ALL";
       }
+      {
+        name = "icingaweb2";
+        ensurePermissions."icingaweb2.*" = "ALL";
+      }
     ];
+  };
+
+  services.icingaweb2 = {
+    enable = true;
+    authentications.mysql = {
+      backend = "db";
+      resource = "icingaweb2";
+    };
+    roles.icingaadmin = {
+      users = "icingaadmin";
+      permissions = "*";
+    };
+    resources = let
+      db = name: {
+        type = "db";
+        db = "mysql";
+        host = "localhost";
+        username = "icingaweb2";
+        dbname = name;
+        charset = "utf8";
+      };
+    in {
+      icingaweb2 = db "icingaweb2";
+    };
+    modules.monitoring.enable = false;
   };
 }
