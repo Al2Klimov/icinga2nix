@@ -84,7 +84,10 @@ INSERT INTO icingaweb_user VALUES ('icingaadmin', 1, '$2y$10$38ttWP3MFfQ2c5GtPEd
       }
       {
         name = "icingaweb2";
-        ensurePermissions."icingaweb2.*" = "ALL";
+        ensurePermissions = {
+          "icingaweb2.*" = "ALL";
+          "icingadb.*" = "SELECT";
+        };
       }
     ];
   };
@@ -110,7 +113,19 @@ INSERT INTO icingaweb_user VALUES ('icingaadmin', 1, '$2y$10$38ttWP3MFfQ2c5GtPEd
       };
     in {
       icingaweb2 = db "icingaweb2";
+      icingadb = db "icingadb";
     };
     modules.monitoring.enable = false;
+    modulePackages.icingadb = pkgs.fetchFromGitHub {
+      owner = "Icinga";
+      repo = "icingadb-web";
+      rev = "v1.1.3";
+      hash = "sha256-vcuIOgA1TDwdB/PujP5zpyaYt1rcWuc6vKdcpIQmz+Q=";
+    };
   };
+
+  environment.etc."icingaweb2/modules/icingadb/config.ini".text = ''
+[icingadb]
+resource = "icingadb"
+'';
 }
