@@ -94,6 +94,7 @@ INSERT INTO icingaweb_user VALUES ('icingaadmin', 1, '$2y$10$38ttWP3MFfQ2c5GtPEd
 
   services.icingaweb2 = {
     enable = true;
+    generalConfig.global.config_resource = "icingaweb2";
     authentications.mysql = {
       backend = "db";
       resource = "icingaweb2";
