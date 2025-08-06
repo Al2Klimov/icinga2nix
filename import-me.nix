@@ -125,6 +125,14 @@ INSERT INTO icingaweb_user VALUES ('icingaadmin', 1, '$2y$10$38ttWP3MFfQ2c5GtPEd
     };
   };
 
+  nixpkgs.overlays = [
+    (_: prev: {
+      icingaweb2 = prev.icingaweb2.overrideAttrs (_: {
+        patches = [ ./opcache_reset.patch ];
+      });
+    })
+  ];
+
   environment.etc."icingaweb2/modules/icingadb/config.ini".text = ''
 [icingadb]
 resource = "icingadb"

@@ -1,0 +1,5 @@
+--- a/public/index.php
++++ b/public/index.php
+@@ -4,1 +4,2 @@
++opcache_reset();
+ require_once dirname(__DIR__) . '/library/Icinga/Application/webrouter.php';
