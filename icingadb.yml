@@ -1,0 +1,6 @@
+database:
+  host: /run/mysqld/mysqld.sock
+  user: icingadb
+  database: icingadb
+redis:
+  host: 127.0.0.1
